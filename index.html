@@ -1,1 +1,54 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 LED Control</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding-top: 50px; background: #f4f4f4; }
+        .btn { padding: 15px 30px; font-size: 20px; cursor: pointer; border: none; border-radius: 5px; margin: 10px; color: white; transition: 0.3s; }
+        .on { background-color: #28a745; } .on:hover { background-color: #218838; }
+        .off { background-color: #dc3545; } .off:hover { background-color: #c82333; }
+    </style>
+</head>
+<body>
+
+    <h1>ESP32 Control Panel</h1>
+    <p>Status: <span id="statusText">Updating...</span></p>
+    
+    <button class="btn on" onclick="setLED(1)">Turn ON</button>
+    <button class="btn off" onclick="setLED(0)">Turn OFF</button>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+
+        // Your actual config provided
+        const firebaseConfig = {
+            apiKey: "AIzaSyBLKmXGVHorqyP96vU72e9yzb3W_N7cJSI",
+            authDomain: "ramanan-2428d.firebaseapp.com",
+            databaseURL: "https://ramanan-2428d-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "ramanan-2428d",
+            storageBucket: "ramanan-2428d.firebasestorage.app",
+            messagingSenderId: "1058274265795",
+            appId: "1:1058274265795:web:0b8b7a622b00a2b2a6f076"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Function to update the database
+        window.setLED = (val) => {
+            set(ref(db, 'ledStatus'), val);
+        };
+
+        // Listen for changes to show real-time status on the webpage
+        const ledRef = ref(db, 'ledStatus');
+        onValue(ledRef, (snapshot) => {
+            const data = snapshot.val();
+            document.getElementById('statusText').innerText = data === 1 ? "LED is ON" : "LED is OFF";
+        });
+    </script>
+</body>
+</html>
